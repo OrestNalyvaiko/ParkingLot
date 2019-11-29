@@ -1,0 +1,41 @@
+Configuration:
+  name: Log4j2_Config
+  Properties:
+    Property:
+      name: log-path
+      value: logs
+  Appenders:
+
+    RollingFile:
+      name: everyDayRollFile
+      fileName: ${log-path}/everyDayRollFile.log
+      filePattern: "${log-path}/archive/everyDayRollFile.log-%d{yyyy-MM-dd}.gz"
+      PatternLayout:
+        Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %class{1}:%L - %msg%xEx{short}%n"
+      Policies:
+        TimeBasedTriggeringPolicy:
+          interval: 1
+          modulate: true
+
+    Console:
+      name: Console_Appender
+      PatternLayout:
+        Pattern: "%highlight{%-5level}{FATAL=bg_red} %style{%date{yyyy-MM-dd HH:mm:ss.SSS}}{blue} [%t] %class{1}:%L - %highlight{%msg} %xEx{short}%n"
+
+  Loggers:
+    Root:
+      level: all
+
+    Logger:
+    -
+      name: com.nalyvaiko
+      AppenderRef:
+        ref: everyDayRollFile
+    -
+      name: org.springframework.security
+      AppenderRef:
+        ref: Console_Appender
+    -
+      name: org.hibernate
+      AppenderRef:
+        ref: Console_Appender

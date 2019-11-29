@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    active: dev
+
+server:
+  port: 8080
+
+jwt:
+  secret: javainuse
+  #token validity in seconds
+  tokenValidity: 3600
+
+#  jwt.secret=javainuse
+#  logging.level.org.springframework.security.web.FilterChainProxy=DEBUG
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+      hibernate: WARN
