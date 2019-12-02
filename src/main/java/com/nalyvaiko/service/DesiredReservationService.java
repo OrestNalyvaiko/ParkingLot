@@ -23,4 +23,9 @@ public class DesiredReservationService {
     logger.info("Desired reservation is saved to DB");
     return savedDesiredReservation;
   }
+
+  public void deleteDesiredReservation(Long id) {
+    desiredReservationRepository.deleteById(id);
+    logger.info("Desired reservation is deleted from DB");
+  }
 }

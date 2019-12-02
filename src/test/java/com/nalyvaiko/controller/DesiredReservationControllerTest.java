@@ -1,8 +1,10 @@
 package com.nalyvaiko.controller;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -124,6 +126,19 @@ public class DesiredReservationControllerTest {
 
     verify(desiredReservationService, times(1))
         .makeDesiredReservation(desiredReservation);
+  }
+
+  @Test
+  public void whenCancelDesiredReservationThenReturnOK() throws Exception {
+    doNothing().when(desiredReservationService).deleteDesiredReservation(1L);
+
+    mockMvc.perform(delete("/desiredReservations/{id}", 1L)
+        .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andReturn();
+
+    verify(desiredReservationService, times(1))
+        .deleteDesiredReservation(1L);
   }
 }
 

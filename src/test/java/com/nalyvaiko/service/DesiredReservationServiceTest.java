@@ -1,6 +1,7 @@
 package com.nalyvaiko.service;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -77,5 +78,14 @@ public class DesiredReservationServiceTest {
     assertNotNull("Return null not saved desired reservation ",
         savedDesiredReservation);
     verify(desiredReservationRepository).save(desiredReservation);
+  }
+
+  @Test
+  public void whenDeleteDesiredReservationThenDeleteItFromDB() {
+    doNothing().when(desiredReservationRepository).deleteById(1L);
+
+    desiredReservationService.deleteDesiredReservation(1L);
+
+    verify(desiredReservationRepository).deleteById(1L);
   }
 }
