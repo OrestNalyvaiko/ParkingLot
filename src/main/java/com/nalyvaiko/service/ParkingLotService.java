@@ -45,7 +45,7 @@ public class ParkingLotService {
             parkingLot.getCity().getCityName(),
             parkingLot.getCity().getRegion().getRegionName(),
             parkingLot.getCity().getRegion().getCountry().getCountryName());
-    if (!Objects.isNull(parkingLotExist)) {
+    if (Objects.nonNull(parkingLotExist)) {
       logger.warn("SuchAddressExistException is thrown");
       throw new SuchAddressExistException();
     } else {
@@ -59,7 +59,7 @@ public class ParkingLotService {
   private void checkIfCountryExist(ParkingLot parkingLot) {
     Country countryFromDB = countryRepository.findCountryByCountryName(
         parkingLot.getCity().getRegion().getCountry().getCountryName());
-    if (!Objects.isNull(countryFromDB)) {
+    if (Objects.nonNull(countryFromDB)) {
       parkingLot.getCity().getRegion().setCountry(countryFromDB);
       checkIfRegionExist(parkingLot);
     }
@@ -70,7 +70,7 @@ public class ParkingLotService {
         .findRegionByRegionNameAndCountryId(
             parkingLot.getCity().getRegion().getRegionName(),
             parkingLot.getCity().getRegion().getCountry().getId());
-    if (!Objects.isNull(regionFromDB)) {
+    if (Objects.nonNull(regionFromDB)) {
       parkingLot.getCity().setRegion(regionFromDB);
       checkIfCityExist(parkingLot);
     }
@@ -80,7 +80,7 @@ public class ParkingLotService {
     City cityFromDB = cityRepository
         .findCityByCityNameAndRegionId(parkingLot.getCity().getCityName(),
             parkingLot.getCity().getRegion().getId());
-    if (!Objects.isNull(cityFromDB)) {
+    if (Objects.nonNull(cityFromDB)) {
       parkingLot.setCity(cityFromDB);
     }
   }
