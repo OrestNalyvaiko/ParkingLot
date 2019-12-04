@@ -1,7 +1,9 @@
 package com.nalyvaiko.repository;
 
 import com.nalyvaiko.model.ParkingLot;
+import java.math.BigDecimal;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -19,4 +21,11 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
   ParkingLot findParkingLotByAddressCityRegionCountryNames(String address,
       String cityName,
       String regionName, String countryName);
+
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  @Query(value =
+      "UPDATE ParkingLot p SET totalPlaces = :totalPlaces, costPerHour = :costPerHour "
+          + "WHERE p.id = :id")
+  void updateParkingLotPlacesAndCostPerHour(Long id,
+      BigDecimal costPerHour, Integer totalPlaces);
 }

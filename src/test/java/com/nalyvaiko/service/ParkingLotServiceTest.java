@@ -3,6 +3,8 @@ package com.nalyvaiko.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nalyvaiko.exception.SuchAddressExistException;
@@ -129,5 +131,27 @@ public class ParkingLotServiceTest {
         .thenReturn(parkingLot);
 
     parkingLotService.addParkingLot(parkingLot);
+  }
+
+  @Test
+  public void whenUpdateParkingLotPlacesAndCostPerHourThenUpdate() {
+    doNothing().when(parkingLotRepository)
+        .updateParkingLotPlacesAndCostPerHour(parkingLot.getId(),
+            parkingLot.getCostPerHour(), parkingLot.getTotalPlaces());
+
+    parkingLotService.updateParkingLotPlacesAndCostPerHour(parkingLot.getId(),
+        parkingLot.getTotalPlaces(), parkingLot.getCostPerHour());
+
+    verify(parkingLotRepository)
+        .updateParkingLotPlacesAndCostPerHour(parkingLot.getId(),
+            parkingLot.getCostPerHour(), parkingLot.getTotalPlaces());
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void whenUpdateParkingLotPlacesAndCostPerHourWithCostPerHourScaleBiggerThen2ThenThrowRuntimeException() {
+    parkingLot.setCostPerHour(BigDecimal.valueOf(25.786));
+
+    parkingLotService.updateParkingLotPlacesAndCostPerHour(parkingLot.getId(),
+        parkingLot.getTotalPlaces(), parkingLot.getCostPerHour());
   }
 }

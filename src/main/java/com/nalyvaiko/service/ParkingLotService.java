@@ -9,8 +9,10 @@ import com.nalyvaiko.repository.CityRepository;
 import com.nalyvaiko.repository.CountryRepository;
 import com.nalyvaiko.repository.ParkingLotRepository;
 import com.nalyvaiko.repository.RegionRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,5 +85,17 @@ public class ParkingLotService {
     if (Objects.nonNull(cityFromDB)) {
       parkingLot.setCity(cityFromDB);
     }
+  }
+
+  public void updateParkingLotPlacesAndCostPerHour(Long id,
+      Integer totalPlaces, BigDecimal costPerHour) {
+    Optional.ofNullable(costPerHour).filter(c -> c.scale() <= 2)
+        .orElseThrow(RuntimeException::new);
+    parkingLotRepository
+        .updateParkingLotPlacesAndCostPerHour(id, costPerHour, totalPlaces);
+    logger
+        .info(
+            "Total places and cost per hour in parking lot with id = " + id
+                + " are updated");
   }
 }

@@ -1,5 +1,6 @@
 package com.nalyvaiko.repository;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.nalyvaiko.model.City;
@@ -58,5 +59,19 @@ public class ParkingLotRepositoryTest {
                 .getCountryName());
 
     assertNotNull("Parking lot from DB is null ", parkingLotFromDB);
+  }
+
+  @Test
+  public void whenUpdateParkingLotPlacesAndCostPerHourThenUpdate() {
+    parkingLotRepository
+        .updateParkingLotPlacesAndCostPerHour(parkingLot.getId(),
+            BigDecimal.valueOf(100, 2), 100);
+    parkingLot = parkingLotRepository.findById(parkingLot.getId())
+        .orElseThrow(RuntimeException::new);
+
+    assertEquals("Total places are not equal ", 100,
+        parkingLot.getTotalPlaces());
+    assertEquals("Cost per hour are not equal ", BigDecimal.valueOf(100, 2),
+        parkingLot.getCostPerHour());
   }
 }

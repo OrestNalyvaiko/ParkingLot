@@ -1,10 +1,12 @@
 package com.nalyvaiko.controller;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -131,5 +133,23 @@ public class ParkingLotControllerTest {
         .andExpect(status().isConflict());
 
     verify(parkingLotService, times(1)).addParkingLot(parkingLot);
+  }
+
+  @Test
+  public void whenUpdateParkingLotTotalPlacesAndCostPerHourThenReturnOK()
+      throws Exception {
+    doNothing().when(parkingLotService)
+        .updateParkingLotPlacesAndCostPerHour(1L, 20,
+            BigDecimal.valueOf(20.5));
+
+    mockMvc.perform(put("/parkingLots/{id}", 1L)
+        .param("cost", "20.5")
+        .param("places", "20")
+        .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk());
+
+    verify(parkingLotService, times(1))
+        .updateParkingLotPlacesAndCostPerHour(1L, 20,
+            BigDecimal.valueOf(20.5));
   }
 }
