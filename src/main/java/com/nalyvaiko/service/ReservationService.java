@@ -1,5 +1,6 @@
 package com.nalyvaiko.service;
 
+import com.nalyvaiko.dto.StatisticDTO;
 import com.nalyvaiko.mail.MailSender;
 import com.nalyvaiko.model.PlaceStatus;
 import com.nalyvaiko.model.Reservation;
@@ -8,9 +9,11 @@ import com.nalyvaiko.repository.DesiredReservationRepository;
 import com.nalyvaiko.repository.PlaceStatusRepository;
 import com.nalyvaiko.repository.ReservationRepository;
 import com.nalyvaiko.repository.UserRepository;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,5 +80,23 @@ public class ReservationService {
     desiredReservationRepository.findDesiredReservationsWhichMatchDates(
         deletedReservation.getStartDate(), deletedReservation.getEndDate())
         .ifPresent(r -> r.forEach(mailSender::sendDesiredAvailableReservation));
+  }
+
+  public StatisticDTO getTotalPriceAndReservationsBetweenDates(Long id,
+      LocalDateTime startDate, LocalDateTime endDate) {
+    List<Reservation> reservationsByParkingLotIdAndDates = reservationRepository
+        .findReservationsByParkingLotIdStartAndEndDates(id,
+            Timestamp.valueOf(startDate), Timestamp.valueOf(endDate))
+        .orElse(new ArrayList<>());
+    BigDecimal totalPrice = reservationsByParkingLotIdAndDates.stream()
+        .map(Reservation::getPrice)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    Long totalReservations = ((Integer) reservationsByParkingLotIdAndDates
+        .size())
+        .longValue();
+    StatisticDTO statisticDTO = new StatisticDTO(totalPrice, totalReservations);
+    logger.info("Statistic from " + startDate + " to " + endDate
+        + " from parking lot with id " + id + " was got");
+    return statisticDTO;
   }
 }

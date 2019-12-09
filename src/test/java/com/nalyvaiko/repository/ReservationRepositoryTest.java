@@ -16,6 +16,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -123,5 +124,22 @@ public class ReservationRepositoryTest {
     assertNotNull("Reservations from DB is null ", reservationsFromDB);
     assertEquals("Expected reservations and reservation from DB are not equal ",
         reservations, reservationsFromDB);
+  }
+
+  @Test
+  public void whenFindReservationsByParkingLotIdStartAndEndDatesReturnOptionalListOfReservations() {
+    List<Reservation> reservations = new ArrayList<>();
+    reservations.add(reservation);
+
+    Optional<List<Reservation>> reservationList = reservationRepository
+        .findReservationsByParkingLotIdStartAndEndDates(
+            reservation.getParkingLot().getId(),
+            Timestamp.valueOf(LocalDateTime.of(2019, 11, 11, 16, 30, 0)),
+            Timestamp.valueOf(LocalDateTime.of(2019, 11, 11, 17, 30, 0)));
+
+    assertNotNull("Reservations from DB is null", reservationList);
+    assertEquals(
+        "Expected reservations and reservations from DB are not equal ",
+        reservations, reservationList.orElseThrow(RuntimeException::new));
   }
 }

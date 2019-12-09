@@ -1,6 +1,7 @@
 package com.nalyvaiko.service;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doNothing;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nalyvaiko.dto.StatisticDTO;
 import com.nalyvaiko.mail.MailSender;
 import com.nalyvaiko.model.City;
 import com.nalyvaiko.model.Country;
@@ -189,5 +191,29 @@ public class ReservationServiceTest {
     verify(reservationRepository, times(1)).deleteById(1L);
     verify(mailSender, times(1))
         .sendDesiredAvailableReservation(desiredReservation);
+  }
+
+  @Test
+  public void whenGetTotalPriceAndReservationsBetweenDatesThenReturnStatisticDto() {
+    List<Reservation> reservations = new ArrayList<>();
+    reservations.add(this.reservation);
+
+    when(reservationRepository.findReservationsByParkingLotIdStartAndEndDates(
+        reservation.getParkingLot().getId(),
+        Timestamp.valueOf(LocalDateTime.of(2019, 11, 11, 16, 30, 0)),
+        Timestamp.valueOf(LocalDateTime.of(2019, 11, 11, 17, 30, 0))))
+        .thenReturn(Optional.of(reservations));
+
+    StatisticDTO statisticDTO = reservationService
+        .getTotalPriceAndReservationsBetweenDates(
+            reservation.getParkingLot().getId(),
+            LocalDateTime.of(2019, 11, 11, 16, 30, 0),
+            LocalDateTime.of(2019, 11, 11, 17, 30, 0));
+
+    assertNotNull("StatisticDTO is null ", statisticDTO);
+    assertEquals("Total price is not as expected ", reservation.getPrice(),
+        statisticDTO.getTotalAmount());
+    assertEquals("Total reservations is not as expected ",
+        Long.valueOf(1L), statisticDTO.getTotalReservations());
   }
 }
