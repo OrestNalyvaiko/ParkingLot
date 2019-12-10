@@ -10,11 +10,17 @@ import com.nalyvaiko.repository.PlaceStatusRepository;
 import com.nalyvaiko.repository.ReservationRepository;
 import com.nalyvaiko.repository.UserRepository;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,9 +100,28 @@ public class ReservationService {
     Long totalReservations = ((Integer) reservationsByParkingLotIdAndDates
         .size())
         .longValue();
-    StatisticDTO statisticDTO = new StatisticDTO(totalPrice, totalReservations);
+
+    Map<User, Double> usersPercentageOfTotalReservations = getUsersAndTheirPercentageOfReservationsFromTotalReservations(
+        reservationsByParkingLotIdAndDates);
+    StatisticDTO statisticDTO = new StatisticDTO(totalPrice, totalReservations,
+        usersPercentageOfTotalReservations);
     logger.info("Statistic from " + startDate + " to " + endDate
         + " from parking lot with id " + id + " was got");
     return statisticDTO;
+  }
+
+  private Map<User, Double> getUsersAndTheirPercentageOfReservationsFromTotalReservations(
+      List<Reservation> reservations) {
+    Map<User, Long> map = reservations.stream()
+        .map(Reservation::getUser)
+        .collect(
+            Collectors.groupingBy(Function.identity(), Collectors.counting()));
+    return map.entrySet().stream()
+        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+        .collect(Collectors
+            .toMap(Map.Entry::getKey, v -> new BigDecimal(
+                    (double) v.getValue() / reservations.size() * 100)
+                    .setScale(2, RoundingMode.HALF_UP).doubleValue(),
+                (oldValue, newValue) -> oldValue, LinkedHashMap::new));
   }
 }

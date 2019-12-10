@@ -215,5 +215,9 @@ public class ReservationServiceTest {
         statisticDTO.getTotalAmount());
     assertEquals("Total reservations is not as expected ",
         Long.valueOf(1L), statisticDTO.getTotalReservations());
+    assertEquals("User of reservation is not as expected ",
+        reservation.getUser(),
+        statisticDTO.getUsersPercentageOfTotalReservations().keySet().iterator()
+            .next());
   }
 }

@@ -15,6 +15,7 @@ import com.nalyvaiko.util.JwtTokenUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,7 +76,8 @@ public class OwnerControllerTest {
     when(reservationService.getTotalPriceAndReservationsBetweenDates(1L,
         LocalDateTime.of(2019, 11, 11, 16, 30, 0),
         LocalDateTime.of(2019, 11, 11, 17, 30, 0)))
-        .thenReturn(new StatisticDTO(BigDecimal.valueOf(100), 10L));
+        .thenReturn(
+            new StatisticDTO(BigDecimal.valueOf(100), 10L, new HashMap<>()));
 
     mockMvc.perform(get("/parkingLot/{id}/statisticBetweenDates", 1L)
         .header("Authorization", "Bearer " + token)
